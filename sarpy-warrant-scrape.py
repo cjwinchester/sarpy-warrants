@@ -8,16 +8,6 @@ from mechanize import Browser
 from bs4 import *
 from time import *
 import re
-import datetime
-
-# today
-today = str(datetime.date.today().strftime("%m-%d-%Y"))
-
-# open a file to write to
-f = open('sarpy-warrents' + today + '.txt', 'wb')
-
-# add headers to text file
-f.write('number|last|rest|dob|eyes|hair|sex|race|height|weight|address|apt|city|state|issued|type|court|agency|due|crime\n')
 
 # crank up a browser
 mech = Browser()
@@ -31,7 +21,7 @@ mech.set_handle_robots(False)
 # define opening url
 baseurl = "http://www.sarpy.com/sheriff/warrants/Results.asp?lname=&fname=&sType=0&Disclaimer=0"
 
-# beautifulsoup that bizzo
+# soup!
 page = mech.open(baseurl)
 html = page.read()
 soup = BeautifulSoup(html)
@@ -85,11 +75,10 @@ while (count < numwarrants):
     status = deets[1].get_text(strip=True)
 
     moredeets = fonts[5].findAll('b')
-    type = moredeets[1].get_text(strip=True)
+    typeofthing = moredeets[1].get_text(strip=True)
     court = moredeets[2].get_text(strip=True)
 
     agency = fonts[6].findAll('b')[0].get_text(strip=True)
-
     due = fonts[7].findAll('b')[0].get_text(strip=True)
 
     charges = []
@@ -101,11 +90,10 @@ while (count < numwarrants):
 
     problems = ' and '.join(charges)
 
-    fullrecord = (rest, last, dob, eyes, hair, race, sex, height, weight, address, apt, city, state, issued, status, type, court, agency, due, problems)
+    fullrecord = (rest, last, dob, eyes, hair, race, sex, height, weight, address, apt, city, state, issued, status, typeofthing, court, agency, due, problems)
 
     print "|".join(fullrecord)
     count = count + 1
-    print "Success! Record written. Going back for more...\n"
     
     # navigate back
     mech.back()
