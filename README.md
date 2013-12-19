@@ -1,4 +1,4 @@
-sarpy-warrants
+Scraper: Sarpy County (Neb.) warrants
 ==============
 
-Sarpy County warrant scraper.
+Using Beautiful Soup to turn <a href="http://www.sarpy.com/sheriff/warrants/" target="_blank">this hot mess</a> into something useful.
