@@ -34,14 +34,18 @@ baseurl = "http://www.sarpy.com/sheriff/warrants/Results.asp?lname=&fname=&sType
 # beautifulsoup that bizzo
 page = mech.open(baseurl)
 
-if page.code == 200:
+try:
     html = page.read()
+except mechanize.HTTPError, e:
+    if int(e.code) != 200:
+        print e
+else:
     soup = BeautifulSoup(html)
     clicks = soup.findAll('form')
 
     numwarrants = len(clicks)
 
-    print "\nSlurping up " + str(numwarrants) + " active warrants ..."
+    print "\nSlurping up " + str(numwarrants) + " active warrants ...\n=============================\n"
 
     count = 0
     while (count < numwarrants):
