@@ -34,86 +34,78 @@ baseurl = "http://www.sarpy.com/sheriff/warrants/Results.asp?lname=&fname=&sType
 # beautifulsoup that bizzo
 page = mech.open(baseurl)
 
-try:
-    html = page.read()
-except mechanize.HTTPError, e:
-    if int(e.code) != 200:
-        print e
-else:
-    soup = BeautifulSoup(html)
-    clicks = soup.findAll('form')
+soup = BeautifulSoup(html)
+clicks = soup.findAll('form')
 
-    numwarrants = len(clicks)
+numwarrants = len(clicks)
+print "\nSlurping up " + str(numwarrants) + " active warrants ...\n=============================\n"
 
-    print "\nSlurping up " + str(numwarrants) + " active warrants ...\n=============================\n"
-
-    count = 0
-    while (count < numwarrants):
-        mech.select_form(nr=count)
-        req = mech.submit()
-        resultspage = req.read()
-        soup = BeautifulSoup(resultspage)
+count = 0
+while (count < numwarrants):
+    mech.select_form(nr=count)
+    req = mech.submit()
+    soup = BeautifulSoup(resultspage)
         
-        table = soup.findAll('table')[0]
-        table2 = soup.findAll('table')[1]
+    table = soup.findAll('table')[0]
+    table2 = soup.findAll('table')[1]
         
-        findnum = re.search('<b>WAR\d+', str(table))
-        warrant_number = findnum.group().replace("<b>","")
+    findnum = re.search('<b>WAR\d+', str(table))
+    warrant_number = findnum.group().replace("<b>","")
+       
+    fonts = soup.findAll('font')
         
-        fonts = soup.findAll('font')
+    namething = fonts[1].get_text(strip=True).encode('utf-8')
+    nameraw = namething.replace('\xc2','').replace('\xa0','')
+    almostthere = re.sub(r'\s\s+', ' ', nameraw).replace(" ","|", 1).replace('DOB:','|').replace('Name:','')
+    last = almostthere.split('|')[0].strip()
+    rest = almostthere.split('|')[1].strip()
+    dob = almostthere.split('|')[2].strip()
         
-        namething = fonts[1].get_text(strip=True).encode('utf-8')
-        nameraw = namething.replace('\xc2','').replace('\xa0','')
-        almostthere = re.sub(r'\s\s+', ' ', nameraw).replace(" ","|", 1).replace('DOB:','|').replace('Name:','')
-        last = almostthere.split('|')[0].strip()
-        rest = almostthere.split('|')[1].strip()
-        dob = almostthere.split('|')[2].strip()
+    att = fonts[2].findAll('b')
+       
+    eyes = att[0].get_text(strip=True)
+    hair = att[1].get_text(strip=True)
+    sex = att[2].get_text(strip=True)
+    race = att[3].get_text(strip=True)
+    height = att[4].get_text(strip=True)
+    weight = att[5].get_text(strip=True)
         
-        att = fonts[2].findAll('b')
+    contacts = fonts[3].findAll('b')
+    address = contacts[0].get_text(strip=True)
+    apt = contacts[1].get_text(strip=True)
+    city = contacts[2].get_text(strip=True)
+    state = contacts[3].get_text(strip=True)
         
-        eyes = att[0].get_text(strip=True)
-        hair = att[1].get_text(strip=True)
-        sex = att[2].get_text(strip=True)
-        race = att[3].get_text(strip=True)
-        height = att[4].get_text(strip=True)
-        weight = att[5].get_text(strip=True)
+    deets = fonts[4].findAll('b')
+    issued = deets[0].get_text(strip=True)
+    status = deets[1].get_text(strip=True)
         
-        contacts = fonts[3].findAll('b')
-        address = contacts[0].get_text(strip=True)
-        apt = contacts[1].get_text(strip=True)
-        city = contacts[2].get_text(strip=True)
-        state = contacts[3].get_text(strip=True)
+    moredeets = fonts[5].findAll('b')
+    type = moredeets[1].get_text(strip=True)
+    court = moredeets[2].get_text(strip=True)
         
-        deets = fonts[4].findAll('b')
-        issued = deets[0].get_text(strip=True)
-        status = deets[1].get_text(strip=True)
+    agency = fonts[6].findAll('b')[0].get_text(strip=True)
+       
+    due = fonts[7].findAll('b')[0].get_text(strip=True)
         
-        moredeets = fonts[5].findAll('b')
-        type = moredeets[1].get_text(strip=True)
-        court = moredeets[2].get_text(strip=True)
+    charges = []
         
-        agency = fonts[6].findAll('b')[0].get_text(strip=True)
-        
-        due = fonts[7].findAll('b')[0].get_text(strip=True)
-        
-        charges = []
-        
-        for row in table2.findAll('tr')[1:]:
-            col = row.findAll('td')
-            crime = col[0].get_text(strip=True)
-            charges.append(crime) 
+    for row in table2.findAll('tr')[1:]:
+        col = row.findAll('td')
+        crime = col[0].get_text(strip=True)
+        charges.append(crime) 
             
-        problems = ' and '.join(charges)
+    problems = ' and '.join(charges)
         
-        fullrecord = (warrant_number, rest, last, dob, eyes, hair, race, sex, height, weight, address, apt, city, state, issued, status, type, court, agency, due, problems, "\n")
-        print rest.upper() + " " + last.upper()
+    fullrecord = (warrant_number, rest, last, dob, eyes, hair, race, sex, height, weight, address, apt, city, state, issued, status, type, court, agency, due, problems, "\n")
+    print rest.upper() + " " + last.upper()
         
-        f.write("|".join(fullrecord))
-        count = count + 1
+    f.write("|".join(fullrecord))
+    count = count + 1
     
-        # navigate back
-        mech.back()
-        sleep(1)
+    # navigate back
+    mech.back()
+    sleep(1)
 
 f.flush()
 f.close()
