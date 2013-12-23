@@ -34,11 +34,11 @@ baseurl = "http://www.sarpy.com/sheriff/warrants/Results.asp?lname=&fname=&sType
 # beautifulsoup that bizzo
 page = mech.open(baseurl)
 
-soup = BeautifulSoup(html)
+soup = BeautifulSoup(page)
 clicks = soup.findAll('form')
 
 numwarrants = len(clicks)
-print "\nSlurping up " + str(numwarrants) + " active warrants ...\n=============================\n"
+print "\nSlurping up " + str(numwarrants) + " active warrants ...\n==================================\n"
 
 count = 0
 while (count < numwarrants):
