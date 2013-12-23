@@ -44,6 +44,7 @@ count = 0
 while (count < numwarrants):
     mech.select_form(nr=count)
     req = mech.submit()
+    resultspage = req.read()
     soup = BeautifulSoup(resultspage)
         
     table = soup.findAll('table')[0]
