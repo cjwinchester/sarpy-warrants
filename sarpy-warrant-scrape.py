@@ -87,7 +87,7 @@ while (count < numwarrants):
         status = deets[1].get_text(strip=True)
             
         moredeets = fonts[5].findAll('b')
-        type = moredeets[1].get_text(strip=True)
+        warranttype = moredeets[1].get_text(strip=True)
         court = moredeets[2].get_text(strip=True)
             
         agency = fonts[6].findAll('b')[0].get_text(strip=True)
@@ -103,7 +103,7 @@ while (count < numwarrants):
                 
         problems = ' and '.join(charges)
             
-        fullrecord = (warrant_number, rest, last, dob, eyes, hair, race, sex, height, weight, address, apt, city, state, issued, status, type, court, agency, due, problems, "\n")
+        fullrecord = (warrant_number, rest, last, dob, eyes, hair, race, sex, height, weight, address, apt, city, state, issued, status, warranttype, court, agency, due, problems, "\n")
         print rest.upper() + " " + last.upper()
             
         f.write("|".join(fullrecord))
